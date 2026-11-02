@@ -21,21 +21,28 @@
 - Im Header wird `tarifwerk-logo.png` (Schriftzug + orange Linie + „Beratung auf Augenhöhe“) auf **148 × 44 px** (Desktop) bzw. **94 × 28 px** (Handy) verkleinert. Die Unterzeile ist dadurch nur noch **3–5 px hoch** und nicht lesbar. Auch der Schriftzug selbst wird dadurch kleiner, als er sein müsste.
 - Das Favicon (`/favicon.svg`, `/icon-48.png`) hat einen **transparenten Hintergrund**. Der silberne Teil des Zeichens verschwindet in einer hellen Browser-Tab-Leiste.
 - `/favicon.ico` fehlt (404). Browser fragen diese Datei automatisch ab.
+- Das Zeichen liegt auf der Seite nur in **240 × 183 px** vor (`tarifwerk-zeichen.png`). Im App-Icon (`tarifwerk-icon-512.png`) ist rechts der orange Lichtpunkt am Rand **abgeschnitten**.
 - Der Logo-Link hat als zugänglichen Namen nur **„, zur Startseite“** (Bild `alt=""`, Screenreader-Text beginnt mit Komma). „TarifWerk“ fehlt.
 
 ### Lösung
-Fertige Dateien aus dem unveränderten Original liegen im Repo `pyn7r68zsg-lgtm/TarifWerk`, Branch `claude/tarifwerk-website-review-4mk5bw`, Ordner `logo-lesbar/` (Marvin kann sie auch direkt im Chat hochladen):
+Fertige Dateien liegen im Repo `pyn7r68zsg-lgtm/TarifWerk`, Branch `claude/tarifwerk-website-review-4mk5bw`, Ordner `logo-lesbar/` (Marvin kann sie auch direkt im Chat hochladen). Alle stammen aus Marvins **Original-Logodateien** (`logo-lesbar/original/`). Es wurde nur der einfarbige Hintergrund entfernt (Farbe-zu-Transparenz, auf dem Originalgrund pixelgleich), zugeschnitten oder skaliert. **Form, Farben und Effekte sind unverändert.**
 
 | Datei | Was ist anders als vorher | Ziel im Projekt |
 | --- | --- | --- |
-| `tarifwerk-schriftzug.png` | Originaler Schriftzug, nur **zugeschnitten** (ohne Linie und Unterzeile), 959 × 169 px | `public/assets/brand/tarifwerk-schriftzug.png` (neu, das alte Logo bleibt für den Footer) |
-| `favicon.ico` | Originalzeichen auf dem dunklen Grund des App-Icons (#060b16), 16/32/48 px, leicht nachgeschärft | `public/favicon.ico` bzw. `app/favicon.ico` |
+| `tarifwerk-zeichen.png` | Zeichen für **dunklen** Grund, transparent, **749 × 578 px** statt 240 × 183 (aus dem dunklen Original) | ersetzt `public/assets/brand/tarifwerk-zeichen.png`, überall `width={749} height={578}` setzen |
+| `tarifwerk-schriftzug.png` | Originaler Schriftzug der Seite, nur **zugeschnitten** (ohne Linie und Unterzeile), 959 × 169 px | neu: `public/assets/brand/tarifwerk-schriftzug.png` (das alte `tarifwerk-logo.png` bleibt für den Footer) |
+| `tarifwerk-zeichen-hell.png` | Zeichen für **hellen** Grund, transparent, 843 × 640 px (aus dem weißen Original) | neu, für helle Bereiche (z. B. weiße Karten, E-Mails, PDFs) |
+| `tarifwerk-logo-hell.png` | Komplettes Logo mit Unterzeile für **hellen** Grund, transparent, 1196 × 1024 px | neu, für helle Bereiche und Dokumente |
+| `favicon.ico` | Zeichen auf dem dunklen Grund des App-Icons (#060b16), 16/32/48 px, leicht nachgeschärft | `public/favicon.ico` bzw. `app/favicon.ico` |
 | `icon-48.png` | wie oben, 48 px | ersetzt `public/icon-48.png` |
 | `icon-192.png` | wie oben, 192 px | neu, für das Manifest |
-| `apple-icon.png` | Zeichen etwas größer im Quadrat (vorher sehr kleiner Rand) | ersetzt `apple-icon.png` |
+| `apple-icon.png` | 180 px, Zeichen schärfer und etwas größer | ersetzt `apple-icon.png` |
+| `tarifwerk-icon-512.png` | 512 px, schärfer, Lichtpunkt nicht mehr abgeschnitten | ersetzt `public/assets/brand/tarifwerk-icon-512.png` |
+
+Die Logos für **dunklen** Grund (`tarifwerk-zeichen.png`, `tarifwerk-schriftzug.png`) nicht auf hellem Grund verwenden und umgekehrt. Die PNGs sind groß (bis ca. 800 KB). Deshalb immer über `next/image` einbinden, nie mit `unoptimized`. `next/image` liefert dann passende kleine WebP/AVIF-Größen aus.
 
 **Header (alle Seiten):**
-- Statt `tarifwerk-logo.png` den neuen `tarifwerk-schriftzug.png` verwenden. Das Zeichen (`tarifwerk-zeichen.png`) bleibt, ebenso die Hover-Animation.
+- Statt `tarifwerk-logo.png` den neuen `tarifwerk-schriftzug.png` verwenden. Das Zeichen bekommt die neue HD-Datei, die Hover-Animation bleibt.
 - Größen:
   - Desktop: Zeichen **40 px** hoch, Schriftzug **26 px** hoch
   - Handy: Zeichen **32 px** hoch, Schriftzug **20 px** hoch
@@ -45,7 +52,7 @@ Fertige Dateien aus dem unveränderten Original liegen im Repo `pyn7r68zsg-lgtm/
 
 ```tsx
 <Link href="/" aria-label="TarifWerk – zur Startseite" className="group inline-flex min-h-11 items-center gap-2 sm:gap-3">
-  <Image src="/assets/brand/tarifwerk-zeichen.png" alt="" width={240} height={183}
+  <Image src="/assets/brand/tarifwerk-zeichen.png" alt="" width={749} height={578}
          className="h-8 w-auto sm:h-10 transition-transform ..." priority />
   <Image src="/assets/brand/tarifwerk-schriftzug.png" alt="" width={959} height={169}
          className="h-5 w-auto sm:h-[26px]" priority />
@@ -68,6 +75,8 @@ Bei App-Router-Konventionen (`app/icon.png`, `app/apple-icon.png`, `app/favicon.
 - Header-Screenshot Desktop und Handy: Schriftzug klar lesbar, keine Unterzeile im Header.
 - `curl -I https://www.tarifwerk.eu/favicon.ico` liefert 200.
 - Favicon in hellem und dunklem Browser-Tab erkennbar.
+- Alle Stellen, an denen `tarifwerk-zeichen.png` vorkommt (Header, Footer, 404-Seite, Mobilmenü), haben die neuen Maße und sehen nicht verzerrt aus.
+- Das Zeichen wird im Header über `/_next/image?…&w=…` in kleiner Größe geladen, nicht als 560-KB-Original.
 
 Vorher/nachher-Bilder: `logo-lesbar/vorschau/`.
 
